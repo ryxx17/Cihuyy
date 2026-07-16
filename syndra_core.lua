@@ -27,7 +27,7 @@ local Core, GameModules -- forward declaration, diisi setelah semua utilitas & G
 
 -- Validasi key sekarang lewat server (bukan hardcode) -- GANTI URL ini
 -- ke URL hosting key-server kamu (lihat README di proyek syndra-keysystem)
-local API_BASE_URL = "syndra-ks-production.up.railway.app"
+local API_BASE_URL = "https://syndra-ks-production.up.railway.app"
 
 -- Coba beberapa nama fungsi HWID yang umum dipakai berbagai executor.
 -- Kalau tidak ketemu, key tetap bisa dipakai tapi TANPA device-lock.
@@ -88,6 +88,7 @@ if not ok or not SafeGuiParent then SafeGuiParent = PlayerGui end
 -- Hapus instance lama jika ada
 local existing = SafeGuiParent:FindFirstChild("Syndra_V2_Preview")
 if existing then existing:Destroy() end
+warn("[SYNDRA DEBUG] 1/4 - CoreGui bypass OK")
 
 -- =====================================================================
 -- KONSTANTA WARNA
@@ -348,8 +349,9 @@ MainFrame.Visible          = false -- DISEMBUNYIKAN KARENA BELUM LOGIN
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
 -- =====================================================================
--- PRELOAD GAMBAR (blocking — dijalankan duluan sebelum apapun ditampilkan,
--- termasuk sebelum layar login muncul)
+-- PRELOAD GAMBAR (dibatasi waktu maksimal -- kalau lebih dari 8 detik,
+-- lanjut aja daripada nge-hang selamanya kalau ContentProvider bermasalah
+-- di executor/koneksi tertentu)
 -- =====================================================================
 local DaftarGambar = {
     "rbxthumb://type=Asset&id=122082009364146&w=150&h=150",
@@ -367,7 +369,16 @@ local DaftarGambar = {
     "rbxthumb://type=Asset&id=105690080401988&w=150&h=150",
     "rbxthumb://type=Asset&id=114591683170998&w=150&h=150",
 }
-pcall(function() ContentProvider:PreloadAsync(DaftarGambar) end)
+do
+    local imagesReady = false
+    task.spawn(function()
+        pcall(function() ContentProvider:PreloadAsync(DaftarGambar) end)
+        imagesReady = true
+    end)
+    local waitStart = tick()
+    repeat task.wait(0.1) until imagesReady or (tick() - waitStart) > 8
+end
+warn("[SYNDRA DEBUG] 2/4 - Preload gambar OK (selesai atau timeout)")
 
 -- =====================================================================
 -- SISTEM NOTIFIKASI
@@ -850,7 +861,8 @@ Core = {
 GameModules = {
     -- GANTI 0 dengan PlaceId game word-chain kamu (lihat game.PlaceId di output/console),
     -- dan ganti URL-nya kalau sudah upload wordchain.lua ke GitHub/CDN kamu sendiri.
-    [130342654546662] = "https://raw.githubusercontent.com/ryxx17/Cihuyy/refs/heads/main/wordchain_module.lua",
 }
 
+warn("[SYNDRA DEBUG] 3/4 - Sampai sebelum LoginFrame.Visible (GUI login sudah selesai dibangun)")
 LoginFrame.Visible = true
+warn("[SYNDRA DEBUG] 4/4 - LoginFrame.Visible sudah true, layar Welcome HARUS kelihatan sekarang")
