@@ -4,6 +4,7 @@
 -- tidak perlu membangun ulang GUI/utilitas yang sudah ada di core.
 -- =====================================================================
 return function(Core)
+    Core.SendNotification("[MODUL] 0/8 - Modul mulai dijalankan", 2)
     local Players          = Core.Players
     local TweenService     = Core.TweenService
     local ContentProvider  = Core.ContentProvider
@@ -40,6 +41,17 @@ return function(Core)
     State.pool2          = {}
     State.pool3          = {}
     State.isSpoofed      = false
+
+    -- Pengaman: kalau salah satu ini kosong, mending berhenti sekarang dengan
+    -- pesan jelas daripada lanjut bikin ratusan elemen UI yang nggak nempel
+    -- ke mana-mana (parent-nya nil) tapi kelihatan "sukses" tanpa error.
+    assert(MainFrame, "Core.MainFrame kosong -- modul tidak bisa nempelin UI apapun")
+    assert(CreateToggle, "Core.CreateToggle kosong")
+    assert(CreateDropdown, "Core.CreateDropdown kosong")
+    assert(CreatePageContainer, "Core.CreatePageContainer kosong")
+    assert(CreateSidebarTab, "Core.CreateSidebarTab kosong")
+    assert(C, "Core.C (palet warna) kosong")
+    Core.SendNotification("[MODUL] 0.5/8 - Semua elemen dari Core terverifikasi ada", 2)
 
     -- Data kata KBBI khusus modul ini (tidak dipakai game lain)
     local Prefix1, Prefix2, EndsWith = {}, {}, {}
@@ -782,6 +794,7 @@ end)
 -- =====================================================================
 CreateSidebarTab("130969527465346", "105234598969049", true, {TopNav, ContentFrame})
 end -- <== TUTUP BUNGKUS PAGE 1
+SendNotification("[MODUL] 1/8 - Page 1 (Gameplay) selesai dibuat", 2)
 
 -- =====================================================================
 -- PAGE 2: VISUAL (FAKE + FAKE 2)
@@ -1541,6 +1554,7 @@ CreateToggle(Fake2LeftContainer, "Vip", function(state) ApplyVipEffect(state) en
 
 CreateSidebarTab("104010825913281", "71219341119919", false, {VisualPageContainer})
 end -- <== TUTUP BUNGKUS PAGE 2
+SendNotification("[MODUL] 2/8 - Page 2 (Visual) selesai dibuat", 2)
 
 -- =====================================================================
 -- PAGE 3: ESP
@@ -1687,6 +1701,7 @@ do -- <== BUNGKUS MEMORI ESP
         end
     end)
 end -- <== TUTUP BUNGKUS MEMORI ESP
+SendNotification("[MODUL] 3/8 - Page ESP selesai dibuat", 2)
 
 CreateSidebarTab("98861278425029", "78012648056733", false, {EspPageContainer})
 
@@ -1755,6 +1770,7 @@ do -- <== BUNGKUS MEMORI OPTIMIZE
         end
     end)
 end -- <== TUTUP BUNGKUS MEMORI OPTIMIZE
+SendNotification("[MODUL] 4/8 - Page Optimize selesai dibuat", 2)
 
 CreateSidebarTab("71744475953983", "124929807761049", false, {OptimizePageContainer})
 
@@ -1868,6 +1884,7 @@ do -- <== BUNGKUS MEMORI SETTINGS
     end)
     FontDrop.SetSelected("Gotham")
 end -- <== TUTUP BUNGKUS MEMORI SETTINGS
+SendNotification("[MODUL] 5/8 - Page Settings selesai dibuat", 2)
 
 CreateSidebarTab("121289652987098", "80809761456188", false, {SettingPageContainer})
 
@@ -2108,6 +2125,7 @@ ProfileTabBtn.MouseButton1Click:Connect(function()
     ProfilePageContainer.Visible   = true
 end)
 end -- <== TUTUP BUNGKUS PAGE 6
+SendNotification("[MODUL] 6/8 - Page 6 (Profile) selesai, semua halaman UI sudah dibuat", 2)
 
 
 -- =====================================================================
@@ -2581,6 +2599,7 @@ task.spawn(function()
     end
 end)
 
+SendNotification("[MODUL] 7/8 - Semua logic (auto ketik, loop utama, KBBI) selesai di-setup", 2)
 end -- <== TUTUP return function(Core) -- akhir dari modul wordchain
 
 
